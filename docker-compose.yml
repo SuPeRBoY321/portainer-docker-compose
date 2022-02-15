@@ -1,19 +1,22 @@
-version: '3'
-
-services:
   portainer:
-    image: portainer/portainer
-    command: --no-auth
-    ports:
-      - 8000:8000
+    image: portainer/portainer-ce:2.0.0
+    command: -H unix:///var/run/docker.sock
+    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/robin/docker/portainer/mount/:/data
-    restart: always
-    container_name: portainer
+      - portainer_data:/data
     labels:
-          - "traefik.backend=portainer"
-          - "traefik.frontend.rule=Host:portainer.dev"
-          - "traefik.enable=true"
-          - "traefik.port=9000"
-          - "traefik.frontend.entryPoints=http"
+      # Frontend
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`portainer.yourdomain.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.services.frontend.loadbalancer.server.port=9000"
+      - "traefik.http.routers.frontend.service=frontend"
+      - "traefik.http.routers.frontend.tls.certresolver=leresolver"
+      
+      # Edge
+      - "traefik.http.routers.edge.rule=Host(`edge.yourdomain.com`)"
+      - "traefik.http.routers.edge.entrypoints=websecure"
+      - "traefik.http.services.edge.loadbalancer.server.port=8000"
+      - "traefik.http.routers.edge.service=edge"
+      - "traefik.http.routers.edge.tls.certresolver=leresolver"
