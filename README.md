@@ -1,9 +1,9 @@
 ### Portainer 
 ## Install 
 
- Clone repository 
+  Clone repository 
   git clone https://github.com/SuPeRBoY321/portainer-docker-compose
 
- Launch method
+  Launch method
   docker-compose up -d
   
